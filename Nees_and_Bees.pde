@@ -31,11 +31,13 @@ void setup()
   start_x += width/2;
   start_y = 30;
   
-  motion = new float[2];
-  //x_offset
+  motion = new float[3];
+  //x offset
   motion[0] = map(random(1),0,1,-100,100);
-  //y_offset
+  //y offset
   motion[1] = map(random(1),0,1,-100,100);
+  //rotation offset
+  motion[2] = map(random(1),0,1,-PI,PI);
 }
 
 void draw()
@@ -54,17 +56,23 @@ void draw()
     {
       push();
       
+      //add translation motion
+      translate(
+        map(t,0,1,0,motion[0]),
+        map(t,0,1,0,motion[1]));
+      
       //translate to box start location
       translate(
         start_x + x*(box_side_length+box_spacing),
         start_y + y*(box_side_length+box_spacing));
       
-      //translate motion offset
-      translate(
-        map(t,0,1,0,motion[0]),
-        map(t,0,1,0,motion[1]));
+      //translate to 0,0
+      translate(box_side_length/2,box_side_length/2);
       
-      rect(0,0,box_side_length,box_side_length);
+      //add rotation motion
+      rotate(map(t,0,1,0,motion[2]));
+      
+      rect(-box_side_length/2,-box_side_length/2,box_side_length,box_side_length);
       pop();
     }
   }
