@@ -34,14 +34,18 @@ void setup()
   motion = new float[columns][rows][3];
   for(int y=0;y<rows;y++)
   {
+    //set maximum transformations for this row
+    float max_translation = map(y,0,rows-1,0,100);
+    float max_rotation = map(y,0,rows-1,0,PI);
+    
     for(int x=0;x<columns;x++)
     {
       //x offset
-      motion[x][y][0] = map(random(1),0,1,-100,100);
+      motion[x][y][0] = map(random(1),0,1,-max_translation,max_translation);
       //y offset
-      motion[x][y][1] = map(random(1),0,1,-100,100);
+      motion[x][y][1] = map(random(1),0,1,-max_translation,max_translation);
       //rotation offset
-      motion[x][y][2] = map(random(1),0,1,-PI,PI);
+      motion[x][y][2] = map(random(1),0,1,-max_rotation,max_rotation);
     }
   }
 }
