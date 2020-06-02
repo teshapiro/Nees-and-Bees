@@ -8,7 +8,7 @@ int rows,columns;
 float stroke_weight,box_side_length,box_spacing;
 float start_x,start_y;
 
-float[] motion;
+float[][][] motion;
 
 void setup()
 {
@@ -31,13 +31,19 @@ void setup()
   start_x += width/2;
   start_y = 30;
   
-  motion = new float[3];
-  //x offset
-  motion[0] = map(random(1),0,1,-100,100);
-  //y offset
-  motion[1] = map(random(1),0,1,-100,100);
-  //rotation offset
-  motion[2] = map(random(1),0,1,-PI,PI);
+  motion = new float[columns][rows][3];
+  for(int y=0;y<rows;y++)
+  {
+    for(int x=0;x<columns;x++)
+    {
+      //x offset
+      motion[x][y][0] = map(random(1),0,1,-100,100);
+      //y offset
+      motion[x][y][1] = map(random(1),0,1,-100,100);
+      //rotation offset
+      motion[x][y][2] = map(random(1),0,1,-PI,PI);
+    }
+  }
 }
 
 void draw()
@@ -58,8 +64,8 @@ void draw()
       
       //add translation motion
       translate(
-        map(t,0,1,0,motion[0]),
-        map(t,0,1,0,motion[1]));
+        map(t,0,1,0,motion[x][y][0]),
+        map(t,0,1,0,motion[x][y][1]));
       
       //translate to box start location
       translate(
@@ -70,7 +76,7 @@ void draw()
       translate(box_side_length/2,box_side_length/2);
       
       //add rotation motion
-      rotate(map(t,0,1,0,motion[2]));
+      rotate(map(t,0,1,0,motion[x][y][2]));
       
       rect(-box_side_length/2,-box_side_length/2,box_side_length,box_side_length);
       pop();
