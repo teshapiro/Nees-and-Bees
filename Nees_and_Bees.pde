@@ -10,14 +10,22 @@ float start_x,start_y;
 
 float[][][] motion;
 
+//length of cues
+int cue1,cue2,cue3,cue4;
+
 void setup()
 {
   size(700,700);
   frameRate(25);
   smooth(8);
   
+  cue1 = 50;
+  cue2 = 20;
+  cue3 = 50;
+  cue4 = 20;
+  
   frame = 0;
-  max_frames = 50;
+  max_frames = cue1+cue2+cue3+cue4;
   
   rows = 11;
   columns = 6;
@@ -54,8 +62,29 @@ void draw()
 {
   float t = (float)frame/max_frames;
   
-  background(200);
+  //Cues
+  //move to random position
+  if(frame < cue1)
+    {t = (float)frame/cue1;}
+  //hold position
+  else if(frame < cue1+cue2)
+    {t = 1;}
+  //move back to starting positions
+  else if(frame < cue1+cue2+cue3)
+    {t = 1-(float)(frame-cue1-cue2)/cue3;}
+  //hold position
+  else
+    {t = 0;}
   
+  background(200);
+  drawBoxes(t);
+  
+  frame++;
+  if(frame==max_frames)frame=0;
+}
+
+void drawBoxes(float t)
+{
   stroke(0);
   strokeWeight(stroke_weight);
   noFill();
@@ -86,7 +115,4 @@ void draw()
       pop();
     }
   }
-  
-  frame++;
-  if(frame==max_frames)frame=0;
 }
