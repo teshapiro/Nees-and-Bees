@@ -1,5 +1,5 @@
 //Nees and Bees
-//6/2/20
+//6/3/20
 //Elliot Shapiro
 
 int frame,max_frames;
@@ -10,8 +10,11 @@ float start_x,start_y;
 
 float[][][] motion;
 
-//length of cues
-int cue1,cue2,cue3,cue4;
+//length of cues in frames
+int cue1_length,cue2_length,cue3_length,cue4_length;
+//length of time in frames for a row of boxes
+//  to make its transformation motion
+int row_motion_length;
 
 void setup()
 {
@@ -19,13 +22,14 @@ void setup()
   frameRate(25);
   smooth(8);
   
-  cue1 = 50;
-  cue2 = 20;
-  cue3 = 50;
-  cue4 = 20;
+  cue1_length = 30;
+  cue2_length = 30;
+  cue3_length = 30;
+  cue4_length = 30;
+  row_motion_length = 10;
   
   frame = 0;
-  max_frames = cue1+cue2+cue3+cue4;
+  max_frames = cue1_length+cue2_length+cue3_length+cue4_length;
   
   rows = 11;
   columns = 6;
@@ -60,59 +64,103 @@ void setup()
 
 void draw()
 {
-  float t = (float)frame/max_frames;
+  background(200);
   
   //Cues
-  //move to random position
-  if(frame < cue1)
-    {t = (float)frame/cue1;}
-  //hold position
-  else if(frame < cue1+cue2)
-    {t = 1;}
-  //move back to starting positions
-  else if(frame < cue1+cue2+cue3)
-    {t = 1-(float)(frame-cue1-cue2)/cue3;}
-  //hold position
-  else
-    {t = 0;}
+  //Cue 1: move to random position
+  if(frame < cue1_length)
+  {
+    //internal cue frame counter
+    int cue1_frame = frame;
+    for(int y=0;y<rows;y++)
+    {
+      //what frame of cue1_frame this row starts moving
+      int row_start_frame = (cue1_length-row_motion_length)/rows * y;
+      
+      float t;
+      if(cue1_frame < row_start_frame)
+        {t = 0;}
+      else if(cue1_frame < row_start_frame+row_motion_length)
+        {t = (float)(cue1_frame-row_start_frame)/row_motion_length;}
+      else
+        {t = 1;}
+      
+      drawBoxes(y,t);
+    }
+  }
   
-  background(200);
-  drawBoxes(t);
+  //Cue 2: hold position
+  else if(frame < cue1_length+cue2_length)
+  {
+    for(int y=0;y<rows;y++)
+    {
+      drawBoxes(y,1);
+    }
+  }
+  
+  //Cue 3: move back to starting positions
+  else if(frame < cue1_length+cue2_length+cue3_length)
+  {
+    //internal cue frame counter
+    int cue3_frame = frame-cue1_length-cue2_length;
+    for(int y=0;y<rows;y++)
+    {
+      //what frame of cue1_frame this row starts moving
+      int row_start_frame = (cue3_length-row_motion_length)/rows * y;
+      
+      float t;
+      if(cue3_frame < row_start_frame)
+        {t = 1;}
+      else if(cue3_frame < row_start_frame+row_motion_length)
+        {t = 1 - (float)(cue3_frame-row_start_frame)/row_motion_length;}
+      else
+        {t = 0;}
+      
+      drawBoxes(y,t);
+    }
+  }
+  
+  //Cue 4: hold position
+  else
+  {
+    for(int y=0;y<rows;y++)
+    {
+      drawBoxes(y,0);
+    }
+  }
   
   frame++;
   if(frame==max_frames)frame=0;
 }
 
-void drawBoxes(float t)
+//draws a row of boxes
+void drawBoxes(int y,float t)
 {
   stroke(0);
   strokeWeight(stroke_weight);
   noFill();
-  
-  for(int y=0;y<rows;y++)
+
+  for(int x=0;x<columns;x++)
   {
-    for(int x=0;x<columns;x++)
-    {
-      push();
-      
-      //add translation motion
-      translate(
-        map(t,0,1,0,motion[x][y][0]),
-        map(t,0,1,0,motion[x][y][1]));
-      
-      //translate to box start location
-      translate(
-        start_x + x*(box_side_length+box_spacing),
-        start_y + y*(box_side_length+box_spacing));
-      
-      //translate to 0,0
-      translate(box_side_length/2,box_side_length/2);
-      
-      //add rotation motion
-      rotate(map(t,0,1,0,motion[x][y][2]));
-      
-      rect(-box_side_length/2,-box_side_length/2,box_side_length,box_side_length);
-      pop();
-    }
+    push();
+    
+    //add translation motion
+    translate(
+      map(t,0,1,0,motion[x][y][0]),
+      map(t,0,1,0,motion[x][y][1]));
+    
+    //translate to box start location
+    translate(
+      start_x + x*(box_side_length+box_spacing),
+      start_y + y*(box_side_length+box_spacing));
+    
+    //translate to 0,0
+    translate(box_side_length/2,box_side_length/2);
+    
+    //add rotation motion
+    rotate(map(t,0,1,0,motion[x][y][2]));
+    
+    rect(-box_side_length/2,-box_side_length/2,box_side_length,box_side_length);
+    pop();
   }
 }
