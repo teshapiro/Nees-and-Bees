@@ -10,6 +10,7 @@ float start_x,start_y;
 
 //[group][column][row][value(0 = x offset, 1 = y offset, 2 = rotation offset)]
 float[][][][] motion;
+color[] colors;
 
 //length of cues in frames
 int cue1_length,cue2_length,cue3_length,cue4_length;
@@ -23,11 +24,11 @@ void setup()
   frameRate(25);
   smooth(8);
   
-  cue1_length = 30;
+  cue1_length = 50;
   cue2_length = 30;
-  cue3_length = 30;
+  cue3_length = 50;
   cue4_length = 30;
-  row_motion_length = 10;
+  row_motion_length = 20;
   
   frame = 0;
   max_frames = cue1_length+cue2_length+cue3_length+cue4_length;
@@ -66,6 +67,12 @@ void setup()
       }
     }
   }
+  
+  colors = new color[3];
+  colors[0] = color(255,0,0);
+  colors[1] = color(0,255,0);
+  colors[2] = color(0,0,255);
+  blendMode(SUBTRACT);
 }
 
 void draw()
@@ -150,7 +157,7 @@ void draw()
 //draws a row of boxes
 void drawBoxes(int group, int y, float t)
 {
-  stroke((2-group)*50);
+  stroke(colors[group]);
   strokeWeight(stroke_weight);
   noFill();
 
