@@ -46,9 +46,11 @@ void setup()
   motion = new float[columns][rows][3];
   for(int y=0;y<rows;y++)
   {
+    //easing keeps the upper rows a bit more tidy
+    float y_easing = pow(map(y,0,rows-1,0,1),2);
     //set maximum transformations for this row
-    float max_translation = map(y,0,rows-1,0,100);
-    float max_rotation = map(y,0,rows-1,0,PI);
+    float max_translation = lerp(0,60,y_easing);
+    float max_rotation = lerp(0,PI,y_easing);
     
     for(int x=0;x<columns;x++)
     {
