@@ -8,7 +8,8 @@ int rows,columns;
 float stroke_weight,box_side_length,box_spacing;
 float start_x,start_y;
 
-float[][][] motion;
+//[group][column][row][value(0 = x offset, 1 = y offset, 2 = rotation offset)]
+float[][][][] motion;
 
 //length of cues in frames
 int cue1_length,cue2_length,cue3_length,cue4_length;
@@ -43,30 +44,33 @@ void setup()
   start_x += width/2;
   start_y = 30;
   
-  motion = new float[columns][rows][3];
-  for(int y=0;y<rows;y++)
+  motion = new float[3][columns][rows][3];
+  for(int group=0;group<3;group++)
   {
-    //easing keeps the upper rows a bit more tidy
-    float y_easing = pow(map(y,0,rows-1,0,1),2);
-    //set maximum transformations for this row
-    float max_translation = lerp(0,60,y_easing);
-    float max_rotation = lerp(0,PI,y_easing);
-    
-    for(int x=0;x<columns;x++)
+    for(int y=0;y<rows;y++)
     {
-      //x offset
-      motion[x][y][0] = map(random(1),0,1,-max_translation,max_translation);
-      //y offset
-      motion[x][y][1] = map(random(1),0,1,-max_translation,max_translation);
-      //rotation offset
-      motion[x][y][2] = map(random(1),0,1,-max_rotation,max_rotation);
+      //easing keeps the upper rows a bit more tidy
+      float y_easing = pow(map(y,0,rows-1,0,1),2);
+      //set maximum transformations for this row
+      float max_translation = lerp(0,100,y_easing);
+      float max_rotation = lerp(0,PI,y_easing);
+      
+      for(int x=0;x<columns;x++)
+      {
+        //x offset
+        motion[group][x][y][0] = map(random(1),0,1,-max_translation,max_translation);
+        //y offset
+        motion[group][x][y][1] = map(random(1),0,1,0,max_translation);
+        //rotation offset
+        motion[group][x][y][2] = map(random(1),0,1,-max_rotation,max_rotation);
+      }
     }
   }
 }
 
 void draw()
 {
-  background(200);
+  background(255);
   
   //Cues
   //Cue 1: move to random position
@@ -87,7 +91,9 @@ void draw()
       else
         {t = 1;}
       
-      drawBoxes(y,t);
+      drawBoxes(0,y,t);
+      drawBoxes(1,y,t);
+      drawBoxes(2,y,t);
     }
   }
   
@@ -96,7 +102,9 @@ void draw()
   {
     for(int y=0;y<rows;y++)
     {
-      drawBoxes(y,1);
+      drawBoxes(0,y,1);
+      drawBoxes(1,y,1);
+      drawBoxes(2,y,1);
     }
   }
   
@@ -118,7 +126,9 @@ void draw()
       else
         {t = 0;}
       
-      drawBoxes(y,t);
+      drawBoxes(0,y,t);
+      drawBoxes(1,y,t);
+      drawBoxes(2,y,t);
     }
   }
   
@@ -127,7 +137,9 @@ void draw()
   {
     for(int y=0;y<rows;y++)
     {
-      drawBoxes(y,0);
+      drawBoxes(0,y,0);
+      drawBoxes(1,y,0);
+      drawBoxes(2,y,0);
     }
   }
   
@@ -136,9 +148,9 @@ void draw()
 }
 
 //draws a row of boxes
-void drawBoxes(int y,float t)
+void drawBoxes(int group, int y, float t)
 {
-  stroke(0);
+  stroke((2-group)*50);
   strokeWeight(stroke_weight);
   noFill();
 
@@ -148,8 +160,8 @@ void drawBoxes(int y,float t)
     
     //add translation motion
     translate(
-      map(t,0,1,0,motion[x][y][0]),
-      map(t,0,1,0,motion[x][y][1]));
+      map(t,0,1,0,motion[group][x][y][0]),
+      map(t,0,1,0,motion[group][x][y][1]));
     
     //translate to box start location
     translate(
@@ -160,7 +172,7 @@ void drawBoxes(int y,float t)
     translate(box_side_length/2,box_side_length/2);
     
     //add rotation motion
-    rotate(map(t,0,1,0,motion[x][y][2]));
+    rotate(map(t,0,1,0,motion[group][x][y][2]));
     
     rect(-box_side_length/2,-box_side_length/2,box_side_length,box_side_length);
     pop();
